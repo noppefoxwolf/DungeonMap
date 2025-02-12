@@ -1,26 +1,25 @@
-public struct RootNode {
-    public var children: [HierarchyNode]
-    
-    public init(children: [HierarchyNode] = []) {
-        self.children = children
-    }
-}
-
-public final class HierarchyNode: Identifiable {
-    public var id: String
-    public let name: String
-    public let isPresented: Bool
+public final class HierarchyNode: Codable {
+    public var controllerName: String = ""
+    public var controllerAddress: String = ""
+    public var isPresented: Bool = false
     public var children: [HierarchyNode] = []
     
-    init(id: String, name: String, isPresented: Bool) {
-        self.id = id
-        self.name = name
-        self.isPresented = isPresented
+    package init() {}
+    
+    init(rootChildren: [HierarchyNode]) {
+        controllerName = "."
+        controllerAddress = "0x000000"
+        children = rootChildren
+    }
+    
+    init(name: String, address: String) {
+        self.controllerName = name
+        self.controllerAddress = address
     }
 }
 
-extension RootNode {
-    public init(_ printHierarchy: PrintHierarchy) {
+extension HierarchyNode {
+    public convenience init(_ printHierarchy: PrintHierarchy) {
         var nodes: [Int : HierarchyNode] = [:]
         var rootNodes: [HierarchyNode] = []
         
@@ -29,9 +28,10 @@ extension RootNode {
             let isPresented = line.header.positions.last == .presented
             // name:addressだとpresentするごとに生成されて大変
             // name:indexだとnameが重複したときにだるい
-            let id = "\(line.controller.name):\(line.controller.address)"
             let name = line.controller.name
-            let node = HierarchyNode(id: id, name: name, isPresented: isPresented)
+            let address = line.controller.address
+            let node = HierarchyNode(name: name, address: address)
+            node.isPresented = isPresented
             nodes[parentIndex] = node
             
             if parentIndex == 0 {
@@ -42,7 +42,7 @@ extension RootNode {
                 }
             }
         }
-        self = RootNode(children: rootNodes)
+        self.init(rootChildren: rootNodes)
     }
 }
 

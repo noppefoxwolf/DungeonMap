@@ -5,11 +5,11 @@ import Testing
 struct HierarchyNodeMergeTests {
     @Test
     func emptyVSOne() throws {
-        var a = HierarchyNode(id: "root", name: "root", isPresented: false)
+        var a = HierarchyNode()
         a.children = []
-        var b = HierarchyNode(id: "root", name: "root", isPresented: false)
+        var b = HierarchyNode()
         b.children = [
-            HierarchyNode(id: "0", name: "0", isPresented: false)
+            HierarchyNode(id: "0", name: "0", address: "0x000000")
         ]
         a.merge(with: b)
         #expect(a.children.count == 1)
@@ -17,13 +17,13 @@ struct HierarchyNodeMergeTests {
     
     @Test
     func oneVSSameOne() throws {
-        var a = HierarchyNode(id: "root", name: "root", isPresented: false)
+        var a = HierarchyNode()
         a.children = [
-            HierarchyNode(id: "0", name: "0", isPresented: false)
+            HierarchyNode(id: "0", name: "0", address: "0x000000")
         ]
-        var b = HierarchyNode(id: "root", name: "root", isPresented: false)
+        var b = HierarchyNode()
         b.children = [
-            HierarchyNode(id: "0", name: "0", isPresented: false)
+            HierarchyNode(id: "0", name: "0", address: "0x000000")
         ]
         a.merge(with: b)
         #expect(a.children.count == 1)
@@ -31,13 +31,13 @@ struct HierarchyNodeMergeTests {
     
     @Test
     func oneVSOne() throws {
-        var a = HierarchyNode(id: "root", name: "root", isPresented: false)
+        var a = HierarchyNode()
         a.children = [
-            HierarchyNode(id: "0", name: "0", isPresented: false)
+            HierarchyNode(id: "0", name: "0", address: "0x000000")
         ]
-        var b = HierarchyNode(id: "root", name: "root", isPresented: false)
+        var b = HierarchyNode()
         b.children = [
-            HierarchyNode(id: "1", name: "1", isPresented: false)
+            HierarchyNode(id: "1", name: "1", address: "0x000000")
         ]
         a.merge(with: b)
         #expect(a.children.count == 2)
@@ -45,11 +45,11 @@ struct HierarchyNodeMergeTests {
     
     @Test
     func oneVSEmpty() throws {
-        var a = HierarchyNode(id: "root", name: "root", isPresented: false)
+        var a = HierarchyNode()
         a.children = [
-            HierarchyNode(id: "0", name: "0", isPresented: false)
+            HierarchyNode(id: "0", name: "0", address: "0x000000")
         ]
-        var b = HierarchyNode(id: "root", name: "root", isPresented: false)
+        var b = HierarchyNode()
         b.children = []
         a.merge(with: b)
         #expect(a.children.count == 1)

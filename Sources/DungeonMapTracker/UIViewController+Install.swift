@@ -1,4 +1,4 @@
-#if canImport(UIKit)
+#if canImport(UIKit) && DEBUG
 import UIKit
 
 extension UIViewController {
@@ -15,12 +15,20 @@ extension UIViewController {
     @objc
     func swizzled_viewDidAppear(_ animated: Bool) {
         swizzled_viewDidAppear(animated)
-        
-//        let isRootViewController = DungeonMapTracker.shared.window?.rootViewController == self
-//        let isPresentingViewController = presentingViewController != nil
-//        let isFullSizeViewController = view.frame == parent?.view.frame
-//        guard isRootViewController || (isFullSizeViewController || isPresentingViewController) else { return }
         try? DungeonMapTracker.shared.record(for: self)
+    }
+}
+
+extension UIViewController {
+    func printHierarchy() -> String? {
+        let selector = Selector(("_printHierarchy"))
+        guard responds(to: selector) else {
+            return nil
+        }
+        let returnValue = perform(selector)
+        let unretainedValue = returnValue?.takeUnretainedValue()
+        let printHierarchy = unretainedValue as? String
+        return printHierarchy
     }
 }
 #endif

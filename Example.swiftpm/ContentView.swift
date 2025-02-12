@@ -25,7 +25,7 @@ struct ContentView: View {
     @ViewBuilder
     func composeContentView() -> some View {
         NavigationView {
-            Text("Compose")
+            ComposeView()
         }
     }
     

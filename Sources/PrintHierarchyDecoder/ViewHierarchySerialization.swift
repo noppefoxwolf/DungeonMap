@@ -5,9 +5,9 @@ public struct PrintHierarchyDecoder {
     
     public init() {}
     
-    public func decodeAsNode(from data: Data) throws -> RootNode {
+    public func decodeAsNode(from data: Data) throws -> HierarchyNode {
         let object = try decode(from: data)
-        let rootNode = RootNode(object)
+        let rootNode = HierarchyNode(object)
         return rootNode
     }
     

@@ -1,4 +1,4 @@
-#if canImport(UIKit)
+#if canImport(UIKit) && DEBUG
 import UIKit
 import PrintHierarchyDecoder
 import os
@@ -14,26 +14,26 @@ public final class DungeonMapTracker {
     
     weak var window: UIWindow? = nil
     
-    var recordedNode: RootNode = RootNode()
+    var storage: [HierarchyNode] = []
     
     func record(for viewController: UIViewController) throws {
         logger.debug("\(#function)")
         guard let rootViewController = window?.rootViewController else { return }
-        let selector = Selector(("_printHierarchy"))
-        if rootViewController.responds(to: selector) {
-            let returnValue = rootViewController.perform(selector)
-            let unretainedValue = returnValue?.takeUnretainedValue()
-            let printHierarchy = unretainedValue as? String
-            if let printHierarchy {
+//        let address = Unmanaged.passUnretained(viewController).toOpaque()
+//        let hexAddress = String(describing: address)
+//        print("Memory address: \(hexAddress)")
+//        print(viewController.debugDescription)
+        
+        let printHierarchy = rootViewController.printHierarchy()
+        if let printHierarchy {
+            do {
                 let decoder = PrintHierarchyDecoder()
-                do {
-                    let rootNode = try decoder.decodeAsNode(from: Data(printHierarchy.utf8))
-                    recordedNode = recordedNode.merged(with: rootNode, allInclusive: true)
-                    print(recordedNode)
-                } catch {
-                    print(printHierarchy)
-                    fatalError()
-                }
+                let rootNode = try decoder.decodeAsNode(from: Data(printHierarchy.utf8))
+                storage.append(rootNode)
+                printMerged()
+            } catch {
+                print(printHierarchy)
+                fatalError()
             }
         }
         
@@ -41,6 +41,16 @@ public final class DungeonMapTracker {
         //        let image = renderer.image { context in
         //            view.drawHierarchy(in: view.bounds, afterScreenUpdates: true)
         //        }
+    }
+    
+    func printMerged() {
+        let output = storage.reduce(into: HierarchyNode()) { partialResult, rootNode in
+            partialResult.merge(with: rootNode, by: {
+                // FIXME: pushやpresentされるとこの条件だと重複除外できない
+                $0.controllerName == $1.controllerName && $0.controllerAddress == $1.controllerAddress
+            })
+        }
+        print(output)
     }
 }
 

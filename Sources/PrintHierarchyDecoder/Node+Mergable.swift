@@ -1,40 +1,23 @@
 package protocol Mergable {
-    mutating func merge(with other: Self)
+    func merge(with other: Self, by predicate: (Self, Self) throws -> Bool)
 }
 
 extension Mergable {
-    package func merged(with other: Self, allInclusive: Bool) -> Self {
+    package func merged(with other: Self, by predicate: (Self, Self) throws -> Bool) -> Self {
         var copy = self
-        copy.merge(with: other)
+        copy.merge(with: other, by: predicate)
         return copy
     }
 }
 
-extension RootNode: Mergable {
-    package mutating func merge(with other: RootNode) {
-        for child in other.children {
-            if let index = children.firstIndex(where: { $0.id == child.id }) {
-                // 子ノードが既に存在する場合、再帰的にマージ
-                children[index].merge(with: child)
-            } else {
-                // 子ノードが存在しない場合は追加
-                children.append(child)
-            }
-        }
-    }
-}
-
 extension HierarchyNode: Mergable {
-    package func merge(with other: HierarchyNode) {
+    package func merge(with other: HierarchyNode, by predicate: (HierarchyNode, HierarchyNode) throws -> Bool) {
         for child in other.children {
-            if let index = children.firstIndex(where: { $0.id == child.id }) {
-                // 子ノードが既に存在する場合、再帰的にマージ
-                children[index].merge(with: child)
+            if let index = try! children.firstIndex(where: { try predicate($0, child) }) {
+                children[index].merge(with: child, by: predicate)
             } else {
-                // 子ノードが存在しない場合は追加
                 children.append(child)
             }
         }
     }
 }
-
